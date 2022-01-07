@@ -2,14 +2,16 @@ import React from 'react';
 
 function TodoList({ todos }) {
   return (
-    <div className='todoslist'>
+    <div>
       {todos
         ? todos.map((todo) => (
-            <div key={todo.id}>
-              <p className={`${todo.completed ? 'completed' : ''}`}>
-                {todo.title}
-              </p>
-              <p>{todo.days}</p>
+            <div className='todoslist'>
+              <div key={todo.id}>
+                <p className={`${todo.completed ? 'completed' : ''}`}>
+                  {todo.title}
+                </p>
+                <p>{todo.days}</p>
+              </div>
             </div>
           ))
         : 'No todos'}

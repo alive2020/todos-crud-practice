@@ -1,8 +1,9 @@
-import axios, { Axios } from 'axios';
+import axios from 'axios';
 import Head from 'next/head';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import NewTodo from '../components/NewTodo';
+import Pagination from '../components/Pagination';
 import TodoList from '../components/TodoList';
 import styles from '../styles/Home.module.css';
 
@@ -10,19 +11,25 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [todos, setTodos] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [todosPerPage, setTodosPerPage] = useState(10);
+  const [todosPerPage] = useState(10);
 
   useEffect(() => {
-    let todosData = [];
+    // let todosData = [];
     const loadTodos = async () => {
-      const response = await Axios.get(
+      const response = await axios.get(
         'https://jsonplaceholder.typicode.com/todos'
       );
       setTodos(response.data);
+      console.log('todos', todos);
     };
     loadTodos();
-    console.log('todos', todos);
   }, []);
+
+  const indexOfLastTodo = currentPage * todosPerPage;
+  const indexOfFirstTodo = indexOfLastTodo - todosPerPage;
+  const currentTodos = todos.slice(indexOfFirstTodo, indexOfLastTodo);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className={styles.container}>
@@ -34,10 +41,17 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1>My TODOS</h1>
-        <button onClick={() => isModalOpen(true)}>New TODO</button>
-        {isModalOpen && <NewTodo setIsModalOpen={setIsModalOpen} />}
+        <button onClick={() => setIsModalOpen(true)}>New TODO</button>
+        {isModalOpen && (
+          <NewTodo setIsModalOpen={setIsModalOpen} setTodos={(val) => setTodos([val, ...todos])} />
+        )}
         <div>
-          <TodoList todos={todos} />
+          <TodoList todos={currentTodos} setTodos={setTodos} />
+          <Pagination
+            todosPerPage={todosPerPage}
+            totalTodos={todos.length}
+            paginate={paginate}
+          />
         </div>
       </main>
 
