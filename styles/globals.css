@@ -37,12 +37,15 @@ a {
   padding: 25px;
   z-index: 9999;
 }
-.todosList {
+.todosList p {
+  color: red;
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
+  /* justify-content: space-evenly; */
+  border: 1px solid gray;
 }
 
 .completed {
   text-decoration: line-through;
+  color: gray;
 }

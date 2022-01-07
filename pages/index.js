@@ -10,8 +10,10 @@ import styles from '../styles/Home.module.css';
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [todos, setTodos] = useState([]);
+  const [todo, setTodo] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [todosPerPage] = useState(10);
+  console.log('todos add', todos);
 
   useEffect(() => {
     // let todosData = [];
@@ -31,6 +33,25 @@ export default function Home() {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  const handleSave = (todo) => {
+    let newArr = todos.filter((item) => item.id !== todo.id);
+    newArr.unshift(todo);
+    setTodos(newArr);
+    setIsModalOpen(false);
+    setTodo(null);
+  };
+
+  const handleDelete = (id) => {
+    fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
+      method: 'DELETE',
+    })
+      .then((res) => res.json()) // or res.json()
+      .then((res) => console.log('del', res));
+
+    setTodos(todos.filter((todo) => todo.id !== id));
+    // console.log('del', res);
+  };
+
   return (
     <div className={styles.container}>
       <Head>
@@ -41,12 +62,32 @@ export default function Home() {
 
       <main className={styles.main}>
         <h1>My TODOS</h1>
-        <button onClick={() => setIsModalOpen(true)}>New TODO</button>
+        <button
+          onClick={() => {
+            setTodo(null);
+            setIsModalOpen(true);
+          }}
+        >
+          New TODO
+        </button>
         {isModalOpen && (
-          <NewTodo setIsModalOpen={setIsModalOpen} setTodos={(val) => setTodos([val, ...todos])} />
+          <NewTodo
+            todo={todo}
+            handleSave={(todo) => handleSave(todo)}
+            setIsModalOpen={setIsModalOpen}
+            setTodos={(val) => setTodos([val, ...todos])}
+          />
         )}
         <div>
-          <TodoList todos={currentTodos} setTodos={setTodos} />
+          <TodoList
+            todos={currentTodos}
+            setTodos={setTodos}
+            handleDelete={handleDelete}
+            handleEdit={(todo) => {
+              setTodo(todo);
+              setIsModalOpen(true);
+            }}
+          />
           <Pagination
             todosPerPage={todosPerPage}
             totalTodos={todos.length}
